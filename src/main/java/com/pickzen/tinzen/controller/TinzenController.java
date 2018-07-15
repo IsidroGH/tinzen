@@ -3,7 +3,7 @@ package com.pickzen.tinzen.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.pickzen.api.controller.BaseController;
+import com.pickzen.api.shared.controller.BaseController;
 import com.pickzen.tinzen.service.TinzenService;
 import static com.pickzen.api.shared.Utils.stringToList;
 
@@ -24,8 +24,8 @@ public class TinzenController extends BaseController {
 	
 	@RequestMapping(value="/new_session", method=RequestMethod.POST)
 	public Map<String, Object> newSession() {
-		String sessionId = String.valueOf(new Random().nextLong());		
-		tinzenService.setUser(sessionId);
+		String sessionId = UUID.randomUUID().toString();
+		//tinzenService.setUser(sessionId);
 		
 		Map<String,Object> resp = new HashMap<>();
 		resp.put("id",sessionId);

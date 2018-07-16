@@ -32,6 +32,8 @@ public class TinzenController {
 	@RequestMapping(value="/new_session", method=RequestMethod.POST)
 	public ResponseEntity<NewSessionBean> newSession() {
 		log.debug("Tinzen: new_session");
+		com.google.common.collect.Iterables a;
+		
 		String sessionId = UUID.randomUUID().toString();
 		//tinzenService.setUser(sessionId);
 		

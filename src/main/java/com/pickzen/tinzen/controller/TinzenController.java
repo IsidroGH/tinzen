@@ -1,5 +1,6 @@
 package com.pickzen.tinzen.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -32,7 +33,6 @@ public class TinzenController {
 	@RequestMapping(value="/new_session", method=RequestMethod.POST)
 	public ResponseEntity<NewSessionBean> newSession() {
 		log.debug("Tinzen: new_session");
-		com.google.common.collect.Iterables a;
 		
 		String sessionId = UUID.randomUUID().toString();
 		//tinzenService.setUser(sessionId);
@@ -40,27 +40,31 @@ public class TinzenController {
 		return new ResponseEntity<>(new NewSessionBean(sessionId), HttpStatus.OK);
 	}
 	
-	@RequestMapping(value="/new_item/{iid}", method=RequestMethod.POST)
-	public void setItem(@PathVariable("iid") String iid) throws Exception {
-		tinzenService.setItem(iid);		
+	
+	@RequestMapping(value="/set_item/{iid}/{cat}", method=RequestMethod.POST)
+	public void setItem(@PathVariable("iid") String iid, @PathVariable("cat") String cat) throws Exception {
+		ArrayList<String> categories = stringToList(cat);
+		tinzenService.setItem(iid, categories);		
 	}
+	
 	
 	@RequestMapping(value="/event/{uid}/{iid}", method=RequestMethod.POST)
 	public void sendEvent(@PathVariable("uid") String uid, @PathVariable("iid") String iid) {
 		tinzenService.sendEvent(uid, iid);
 	}
 	
-	@RequestMapping(value="/recommendation/{liked_items}/{numRecs}/{blist}", method=RequestMethod.GET)
+	
+	@RequestMapping(value="/recommendation/{liked_items}/{numRecs}/{blist}/{cats}", method=RequestMethod.GET)
 	public HashMap<String,ArrayList<HashMap<String, Object>>> query(
 			@PathVariable("liked_items") String likedItems, 
 			@PathVariable("numRecs") int numRecs,
-			@PathVariable("blist") String blacklist) {
+			@PathVariable("blist") String blacklist,
+			@PathVariable("cats") String cats) {
 		
 		ArrayList<String> likeList = stringToList(likedItems);
 		ArrayList<String> blackList = stringToList(blacklist);
-		JsonObject rec= tinzenService.sendQuery(likeList, numRecs, blackList);
-		// System.out.println(rec);
-		
+		ArrayList<String> categories = stringToList(cats);
+		JsonObject rec= tinzenService.sendQuery(likeList, numRecs, blackList, categories);
 		
 		JsonArray arrayOfItems = rec.get("itemScores").getAsJsonArray();
 		HashMap<String, ArrayList<HashMap<String, Object>>> jsonMap = new HashMap<String, ArrayList<HashMap<String, Object>>>();
@@ -89,12 +93,23 @@ public class TinzenController {
 		return tinzenService.newItem(mid, blist);
 	}
 	
+	
+	@RequestMapping(value="/random/{mid}/{eid}", method=RequestMethod.GET)
+	public int randomRate(@PathVariable int mid, @PathVariable int eid) {
+		return tinzenService.randomRate(mid, eid);
+	}
+	
+	@RequestMapping(value="/skus/{eid}", method=RequestMethod.GET)
+	public ArrayList<String> getSku(@PathVariable int eid) throws SQLException {
+		return tinzenService.getSkus(eid);
+	}
+	
 	public void setMultipleUsers() {
 		// TODO
 	}
 	
+	
 	public void setMultipleItems() {
 		// TODO
 	}
-	
 }
